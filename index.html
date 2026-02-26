@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Goodbye My Lovely Students</title>
+    <link href="https://fonts.googleapis.com/css2?family=Itim&family=Vibur&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 1. ตั้งค่าพื้นฐาน --- */
+        :root { 
+            --bg-gradient: linear-gradient(135deg, #ffcad4 0%, #f4acb7 100%);
+            --text-dark: #6d4c41; 
+            --heart-color: #d81159; 
+            --envelope-color: #ffffff;
+        }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body, html { 
+            margin: 0; padding: 0; 
+            background: var(--bg-gradient);
+            color: var(--text-dark); 
+            font-family: 'Itim', cursive; 
+            width: 100%; min-height: 100vh; 
+            overflow-x: hidden;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* --- 2. หน้าแรก --- */
+        #landing-screen { 
+            position: fixed; inset: 0; 
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            background: var(--bg-gradient);
+            z-index: 1000; 
+            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        
+        .envelope-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 280px; height: 180px;
+        }
+        .envelope-wrapper:active { transform: scale(0.95); }
+
+        .envelope {
+            width: 100%; height: 100%;
+            background: var(--envelope-color);
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 10px;
+        }
+        
+        .envelope::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 100px solid #f2f2f2;
+            border-radius: 10px;
+        }
+
+        .heart-center-wrapper {
+            position: absolute;
+            top: 45px; left: 50%; transform: translateX(-50%);
+            z-index: 2; width: 50px; height: 50px;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .seal-heart {
+            font-size: 50px; 
+            color: var(--heart-color);
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+            animation: beat 1s infinite;
+        }
+        @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        
+        .tap-text {
+            margin-top: 50px; font-size: 1.4rem; color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        /* --- 3. หน้าเนื้อหา --- */
+        #main-content { 
+            display: none; width: 100%; min-height: 100vh;
+            justify-content: center; align-items: center; 
+            position: relative; padding: 20px;
+        }
+
+        .message-box { 
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px; 
+            border-radius: 25px; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1); 
+            max-width: 600px; width: 100%;
+            min-height: 300px;
+            position: absolute; 
+            opacity: 1; transition: opacity 1s, transform 1s;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 20;
+            overflow: visible; 
+        }
+
+        .box-heart-decor {
+            position: absolute;
+            top: -35px; left: -25px; 
+            width: 80px; height: 80px;
+            transform: rotate(-20deg); 
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.15)); 
+            z-index: 25;
+            fill: #ff477e; 
+        }
+        
+        #typed-text { 
+            white-space: pre-wrap; line-height: 2; font-size: 1.2rem; 
+            text-align: center; width: 100%;
+        }
+
+        /* --- 4. ฉากจบ --- */
+        #ending-scene {
+            position: absolute; 
+            width: 100%; height: 100%;
+            opacity: 0; pointer-events: none;
+            transition: opacity 1s;
+            display: block; 
+            z-index: 10;
+        }
+        .show-ending { opacity: 1 !important; pointer-events: auto !important; }
+        .hide-message { opacity: 0 !important; transform: scale(0.9) !important; pointer-events: none !important; }
+
+        .container { width: 100%; height: 100%; position: relative; }
+        
+        /* น้องเด็กอยู่ 35% ตามเดิม */
+        .body_left {
+            width: 130px; 
+            position: absolute; 
+            bottom: 120px; 
+            left: 35%;     
+            z-index: 98;
+            animation: bounceIn 2s infinite ease-in-out;
+        }
+        .body_left img { width: 100%; height: auto; }
+        
+        @keyframes bounceIn { 
+            0%, 100% { transform: translateY(0) rotate(3deg); } 
+            50% { transform: translateY(-8px) rotate(-3deg); } 
+        }
+
+        /* 🔥 แก้ไข: จัดหัวใจให้อยู่กึ่งกลางหน้าจอแบบชัวร์ที่สุด */
+        .love {
+            width: 520px; 
+            height: 440px;
+            position: absolute;
+            
+            /* จุดกึ่งกลางหน้าจอ */
+            left: 50%; 
+            top: 45%; 
+            
+            /* ย้ายจุดศูนย์กลางของหัวใจมาที่จุดกึ่งกลางหน้าจอ */
+            transform: translate(-50%, -50%) scale(0.65);
+            
+            /* ลบ margin เก่าทิ้งเพราะมันคำนวณยากและทำให้เอียง */
+            margin: 0; 
+        }
+
+        .love .block {
+            right: 0;
+            position: absolute;
+            visibility: hidden;
+        }
+
+        .love .block div {
+            width: 40px; height: 40px; 
+            position: absolute;
+            background: url("heart.png") no-repeat; 
+            background-size: contain;
+        }
+
+        .logo { 
+            text-align: center; width: 100%; position: absolute; bottom: 80px; 
+            opacity: 0; transition: opacity 1s; 
+        }
+        .logo b { font: 200 50px "Vibur", sans-serif; color: crimson; text-shadow: 0 0 15px #ffb7b2; }
+
+        #replay-btn {
+            padding: 15px 30px; font-size: 1.2rem;
+            background: white; color: var(--heart-color);
+            border: 3px solid var(--heart-color);
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Itim'; font-weight: bold;
+            display: none; 
+            z-index: 100;
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            box-shadow: 0 5px 15px rgba(216, 17, 89, 0.3);
+        }
+
+        .floating-hearts-container { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+        .float-heart { 
+            position: absolute; bottom: -50px; 
+            font-size: 20px; color: var(--heart-color); opacity: 0.5; 
+            animation: floatUpSoft linear forwards; 
+        }
+        @keyframes floatUpSoft { to { transform: translateY(-110vh) rotate(360deg); opacity: 0; } }
+
+        @media (min-width: 600px) {
+            .love { transform: translate(-50%, -50%) scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <audio id="bgMusic" loop preload="auto"><source src="musiczzz.mp3" type="audio/mpeg"></audio>
+    <div class="floating-hearts-container" id="bg-hearts"></div>
+
+    <div id="landing-screen" onclick="startJourney()">
+        <div class="envelope-wrapper">
+            <div class="envelope"></div>
+            <div class="heart-center-wrapper">
+                <div class="seal-heart">❤</div>
+            </div>
+        </div>
+        <div class="tap-text">แตะเพื่อเปิดอ่าน...</div>
+    </div>
+
+    <div id="main-content">
+        <div class="message-box" id="msg-box">
+            <svg class="box-heart-decor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.0005 26.9688C16.2905 26.9688 26.666 21.0313 26.666 12.7292C26.666 8.35421 23.3338 5.02087 19.3338 5.02087C17.2088 5.02087 16.0005 6.27087 16.0005 6.27087C16.0005 6.27087 14.7922 5.02087 12.6672 5.02087C8.66717 5.02087 5.33383 8.35421 5.33383 12.7292C5.33383 21.0313 15.7105 26.9688 16.0005 26.9688Z" />
+            </svg>
+            <span id="typed-text"></span>
+        </div>
+        
+        <div id="ending-scene">
+            <div class="container">
+                <div class="body_left">
+                    <img id="gifBiu" src="biubiubiu.gif" alt="Kid Pointing">
+                </div>
+                <div class="love">
+                    <div class="block">
+                        <div class="div1"></div><div class="div2"></div><div class="div3"></div><div class="div4"></div>
+                        <div class="div5"></div><div class="div6"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="logo">
+                <b>I <span>Lo</span>ve<span> Y</span>ou</b>
+                <p style="font-family: 'Itim'; font-size: 24px; margin-top: 5px; color: #e75480;">รักและคิดถึงเสมอ... จากครูเอก</p>
+            </div>
+            <button id="replay-btn" onclick="showTextAgain()">อ่านข้อความอีกครั้ง</button>
+        </div>
+    </div>
+
+    <script>
+        const blk_pitn = { 
+            block1: [[0, 1], [0, 0], [-1, 0], [-1, -1]],
+            block2: [[0, 1], [0, 0], [-1, 0], [0, -1]],
+            block3: [[-1, 1], [0, 0], [-1, 0], [-1, -1]],
+            block4: [[0, 1], [0, 0], [-1, 0], [-1, -1]],
+            block5: [[-1, 1], [0, 0], [-1, 0], [0, -1]],
+            block6: [[0, -1], [0, 0], [-1, 0], [1, -1]],
+            block7: [[-1, -1], [0, 0], [-1, 0], [1, 0]],
+            block8: [[-1, 1], [0, 0], [-1, 0], [-1, -1]],
+            block9: [[0, -1], [0, 0], [-1, 0], [1, 0]],
+            block10: [[-1, 1], [0, 0], [-1, 0], [1, 0]],
+            block11: [[2, 0], [0, 0], [-1, 0], [1, 0]],
+            block12: [[0, 1], [0, 0], [-1, 0], [0, -1]],
+            block13: [[0, 1], [0, 0], [-1, 0], [-1, -1]],
+            block14: [[1, 1], [0, 0], [-1, 0], [1, 0]],
+            block15: [[1, -1], [0, 0], [-1, 0], [1, 0]],
+            block16: [[-1, -1], [0, 0], [-1, 0], [1, 0]],
+            block17: [[0, 1], [0, 0], [-1, 0], [0, -1]],
+            block18: [[0, 1], [0, 0], [-1, 0], [-1, -1]],
+            block19: [[0, -1], [0, 0], [-1, 0], [1, 0]],
+            block20: [[1, -1], [0, 0], [-1, 0], [1, 0]],
+            block21: [[0, 1], [0, 0], [-1, 0], [-1, -1]],
+            block22: [[1, 1], [0, 0], [-1, 0], [1, 0]],
+            block23: [[0, 2], [0, 0], [0, -1], [0, 1]]
+        };
+        
+        const offset_pitn = { 
+            block1: [5, 3], block2: [5, 1], block3: [3, 4], block4: [3, 2], block5: [3, -1],
+            block6: [2, 5], block7: [2, 1], block8: [1, -1], block9: [1, -3], block10: [1, 2],
+            block11: [0, 3], block12: [0, 0], block13: [-1, -4], block14: [0, -2], block15: [-2, 4],
+            block16: [-2, 2], block17: [-2, 0], block18: [-3, -2], block19: [-4, 0], block20: [-3, 5],
+            block21: [-5, 3], block22: [-4, 1], block23: [-6, 1]   
+        };
+
+        let isAnimationStarted = false;
+
+        function startHeartAnimation(){
+            if(isAnimationStarted) return;
+            isAnimationStarted = true;
+
+            let blocks = document.getElementsByClassName("block");
+            let block = blocks[0];
+            let love = document.getElementsByClassName("love")[0];
+            let index = 0;
+            let timer = null;
+            
+            love.innerHTML = '<div class="block"><div class="div1"></div><div class="div2"></div><div class="div3"></div><div class="div4"></div><div class="div5"></div><div class="div6"></div></div>';
+            block = love.children[0];
+
+            block.style.top = "50%";
+            block.style.left = "50%";
+            block.style.margin = "-20px 0 0 -20px";
+
+            const block_left = parseFloat(window.getComputedStyle(block, null).left.slice(0, -2));
+            const block_top = parseFloat(window.getComputedStyle(block, null).top.slice(0, -2));
+
+            function Next() {
+                if (++index >= 24) {
+                    clearInterval(timer);
+                    document.querySelector('.logo').style.opacity = 1;
+                    document.getElementById('replay-btn').style.display = 'block';
+                    return;
+                }
+                block.style.visibility = "visible"; 
+                block.style.left = block_left + 40 * offset_pitn["block" + index][0] + "px";
+                block.style.top = block_top - 40 * offset_pitn["block" + index][1] + "px";
+                
+                for (let i = 0; i < block.children.length; i++) {
+                    if (blk_pitn["block" + index][i]) {
+                        block.children[i].style.left = blk_pitn["block" + index][i][0] * -40 + "px";
+                        block.children[i].style.top = blk_pitn["block" + index][i][1] * -40 + "px";
+                        block.children[i].style.display = "block"; 
+                    } else {
+                         block.children[i].style.display = "none";
+                    }
+                }
+
+                let clone_block = block.cloneNode(true);
+                love.appendChild(clone_block);
+            }
+            timer = setInterval(Next, 100);
+        }
+
+        const message=`ถึงนักเรียนที่น่ารักทุกคน...
+
+เวลา 1 ปีที่ผ่านมา
+
+ขอบคุณสำหรับทุกความทรงจำดีๆ 
+ขอบคุณที่เป็นเด็กดี (บ้าง ดื้อบ้าง 555)
+ขอบคุณที่ทำให้การฝึกสอนของครูมีความหมายมากๆ
+ครูจะไม่ลืมความทรงจำนี้เลย
+
+ถึงเวลาที่ครูต้องไปแล้ว...
+ขอให้ทุกคนเติบโตอย่างสดใส 
+มีความสุขมากๆ กับเส้นทางข้างหน้านะ
+
+อย่าลืมดูแลตัวเองดีๆ นะเด็กๆ
+ครูจะคอยเฝ้าดูความสำเร็จของพวกหนูอยู่เสมอ...
+
+รักทุกคนนะครับ จาก ครูเอก. 💖`;
+
+        const bgMusic = document.getElementById("bgMusic");
+        const landing = document.getElementById("landing-screen");
+        const mainContent = document.getElementById("main-content");
+        const endingScene = document.getElementById("ending-scene");
+        const msgBox = document.getElementById("msg-box");
+
+        window.onload = function() {
+            setInterval(createFloatingHeart, 800);
+        };
+
+        function startJourney(){
+            if(bgMusic) bgMusic.play().catch(e=>console.log("Audio Error"));
+            landing.style.transform = "translateY(-100vh)";
+            setTimeout(()=>{
+                landing.style.display="none";
+                mainContent.style.display="flex";
+                typeWriter();
+            },800);
+        }
+
+        let i=0;
+        function typeWriter(){
+            if(i<message.length){
+                document.getElementById("typed-text").innerHTML+=message.charAt(i);
+                i++;
+                setTimeout(typeWriter,50);
+            }else{
+                setTimeout(switchToAnimation, 5000);
+            }
+        }
+
+        function switchToAnimation() {
+            msgBox.classList.add('hide-message');
+            setTimeout(() => {
+                endingScene.style.display = 'block'; 
+                setTimeout(() => {
+                    endingScene.classList.add('show-ending');
+                    startHeartAnimation();
+                }, 100);
+            }, 500);
+        }
+
+        function showTextAgain() {
+            endingScene.classList.remove('show-ending');
+            setTimeout(() => {
+                endingScene.style.display = 'none';
+                msgBox.classList.remove('hide-message');
+            }, 1000);
+        }
+
+        function createFloatingHeart(){
+            const e=document.createElement("div");
+            e.innerText="❤"; e.classList.add("float-heart");
+            e.style.left=Math.random()*100+"vw";
+            e.style.fontSize=Math.random()*15+15+"px";
+            e.style.animationDuration=Math.random()*5+5+"s";
+            document.getElementById("bg-hearts").appendChild(e);
+            setTimeout(()=>e.remove(),10000);
+        }
+    </script>
+</body>
+</html>
